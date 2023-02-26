@@ -1,5 +1,5 @@
 import { FC } from "react";
-import { Product, UserRole } from "./VendoApiClient";
+import { Product, ProductPayload, UserRole } from "./VendoApiClient";
 import Seller from "./components/Seller";
 import Buyer from "./components/Buyer";
 
@@ -12,6 +12,8 @@ const BuyerApp: FC<{
   onDeposit: (denomination: number) => Promise<number>;
   getProducts: () => Promise<void>;
   removeProduct: (productId: number) => Promise<void>;
+  addProduct: (payload: ProductPayload) => Promise<void>;
+  updateProduct: (productId: number, payload: ProductPayload) => Promise<void>;
   buy: (productId: number, amount: number) => Promise<void>;
 }> = ({
   role,
@@ -23,6 +25,8 @@ const BuyerApp: FC<{
   products,
   removeProduct,
   buy,
+  addProduct,
+  updateProduct,
 }) => {
   return (
     <div className="flex flex-col">
@@ -41,6 +45,8 @@ const BuyerApp: FC<{
       <main className="px-4">
         {role === UserRole.SELLER ? (
           <Seller
+            addProduct={addProduct}
+            updateProduct={updateProduct}
             removeProduct={removeProduct}
             getProducts={getProducts}
             products={products}

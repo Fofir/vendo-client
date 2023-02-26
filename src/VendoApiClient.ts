@@ -90,19 +90,20 @@ export class VendoApiClient {
   };
 
   addProduct = async (payload: ProductPayload) => {
-    return this.api.post("/product", payload) as AxiosPromise<{
-      productName: string;
-      amount: number;
-      cost: number;
-    }>;
+    const response = await this.api.post<any, AxiosResponse<Product>>(
+      "/product",
+      payload
+    );
+    return response.data;
   };
 
   updateProduct = async (productId: number, payload: ProductPayload) => {
-    return this.api.put(`/product/${productId}`, payload) as AxiosPromise<{
-      productName: string;
-      amount: number;
-      cost: number;
-    }>;
+    const response = await this.api.put<any, AxiosResponse<Product>>(
+      `/product/${productId}`,
+      payload
+    );
+
+    return response.data;
   };
 
   removeProduct = async (productId: number) => {

@@ -4,9 +4,13 @@ import MainPage from "./MainPage";
 import Login from "./Login";
 import Register from "./Register";
 import { FC, useCallback, useEffect, useState } from "react";
-import VendoApiClient, { Product, UserRole } from "./VendoApiClient";
-import Spinner from "./components/Spinner";
+import VendoApiClient, {
+  Product,
+  ProductPayload,
+  UserRole,
+} from "./VendoApiClient";
 import { keyBy, orderBy } from "lodash";
+import LoadingScreen from "./components/LoadingScreen";
 
 const useAuth = ({ api }: { api: VendoApiClient }) => {
   const navigate = useNavigate();
@@ -130,10 +134,38 @@ const useAuth = ({ api }: { api: VendoApiClient }) => {
 const useProducts = ({ api }: { api: VendoApiClient }) => {
   const [products, setProducts] = useState<Record<string, Product>>({});
 
+  const addProduct = useCallback(
+    async (payload: ProductPayload) => {
+      const newProduct = await api.addProduct(payload);
+      setProducts({
+        ...products,
+        [newProduct.id]: newProduct,
+      });
+      toast.success(`Product "${payload.productName}" added succesfully`);
+    },
+    [api, products]
+  );
+
+  const updateProduct = useCallback(
+    async (productId: number, payload: ProductPayload) => {
+      const updatedProduct = await api.updateProduct(productId, payload);
+      setProducts({
+        ...products,
+        [updatedProduct.id]: updatedProduct,
+      });
+
+      toast.success(`Product "${payload.productName}" updated succesfully`);
+    },
+    [api, products]
+  );
+
   const removeProduct = useCallback(
     async (productId: number) => {
       await api.removeProduct(productId);
       const newProductsCollection = { ...products };
+      toast.success(
+        `Product "${products[productId].productName}" deleted succesfully`
+      );
       delete newProductsCollection[productId];
       setProducts(newProductsCollection);
     },
@@ -174,6 +206,8 @@ const useProducts = ({ api }: { api: VendoApiClient }) => {
 
   return {
     getProducts,
+    addProduct,
+    updateProduct,
     removeProduct,
     products: orderBy(products, ["productName"], ["asc"]),
     buy,
@@ -186,7 +220,14 @@ const App: FC<{ api: VendoApiClient }> = ({ api }) => {
       api,
     });
 
-  const { buy, getProducts, products, removeProduct } = useProducts({ api });
+  const {
+    buy,
+    getProducts,
+    products,
+    removeProduct,
+    addProduct,
+    updateProduct,
+  } = useProducts({ api });
 
   const buyProduct = useCallback(
     async (productId: number, amount: number) => {
@@ -197,11 +238,7 @@ const App: FC<{ api: VendoApiClient }> = ({ api }) => {
   );
 
   if (!isAuthChecked) {
-    return (
-      <div className="h-screen w-screen flex flex-col justify-center items-center">
-        <Spinner className="w-8 h-8" />
-      </div>
-    );
+    return <LoadingScreen />;
   }
 
   return (
@@ -211,6 +248,8 @@ const App: FC<{ api: VendoApiClient }> = ({ api }) => {
           path="/"
           element={
             <MainPage
+              updateProduct={updateProduct}
+              addProduct={addProduct}
               products={products}
               getProducts={getProducts}
               removeProduct={removeProduct}

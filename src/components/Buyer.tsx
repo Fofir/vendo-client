@@ -2,6 +2,7 @@ import { FC, useCallback, useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
 import cx from "classnames";
 import { Product } from "../VendoApiClient";
+import Button from "./Button";
 
 const ALLOWED_DENOMINATIONS = [5, 10, 20, 50, 100];
 
@@ -50,13 +51,13 @@ const ProductListItem: FC<{
                 max={product.amountAvailable}
               />
             </label>
-            <button
+            <Button
               disabled={totalCost > deposit}
-              className="disabled:opacity-50 rounded rounded-l-none px-4 border-none ring-0 h-8 text-white bg-vendo-primary text-whit"
+              className="rounded-l-none"
               onClick={onBuy}
             >
               Buy
-            </button>
+            </Button>
           </div>
           <div
             className={cx("text-xs font-light", {

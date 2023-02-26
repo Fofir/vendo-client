@@ -9,7 +9,7 @@ const Spinner: FC<{
       <svg
         aria-hidden="true"
         className={cx(
-          "text-gray-200 animate-spin dark:text-gray-500 fill-primary",
+          "text-gray-200 animate-spin dark:text-gray-500 fill-vendo-primary",
           className
         )}
         viewBox="0 0 100 101"
