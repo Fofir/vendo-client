@@ -11,6 +11,15 @@ type UserResponse = AxiosResponse<{
   deposit: number;
 }>;
 
+export type Product = {
+  id: number;
+  cost: number;
+  productName: string;
+  amountAvailable: number;
+};
+
+export type ProductPayload = Omit<Product, "id">;
+
 export class VendoApiClient {
   api: Axios;
   constructor({ baseURL }: { baseURL: string }) {
@@ -59,11 +68,28 @@ export class VendoApiClient {
     return this.api.post("/auth/logout");
   };
 
-  addProduct = async (payload: {
-    productName: string;
-    amount: number;
-    cost: number;
-  }) => {
+  buy = async (payload: { productId: number; amount: number }) => {
+    const response = await this.api.post<
+      any,
+      AxiosResponse<{
+        change: number[];
+        productName: string;
+        spent: number;
+      }>
+    >("/buy", payload);
+
+    return response.data;
+  };
+
+  getProducts = async () => {
+    const response = await this.api.get<any, AxiosResponse<Product[]>>(
+      "/products"
+    );
+
+    return response.data;
+  };
+
+  addProduct = async (payload: ProductPayload) => {
     return this.api.post("/product", payload) as AxiosPromise<{
       productName: string;
       amount: number;
@@ -71,14 +97,7 @@ export class VendoApiClient {
     }>;
   };
 
-  updateProduct = async (
-    productId: number,
-    payload: {
-      productName: string;
-      amount: number;
-      cost: number;
-    }
-  ) => {
+  updateProduct = async (productId: number, payload: ProductPayload) => {
     return this.api.put(`/product/${productId}`, payload) as AxiosPromise<{
       productName: string;
       amount: number;
@@ -88,6 +107,19 @@ export class VendoApiClient {
 
   removeProduct = async (productId: number) => {
     return this.api.delete(`/product/${productId}`) as AxiosPromise;
+  };
+
+  deposit = async (denomination: number) => {
+    const response = await this.api.post<
+      any,
+      AxiosResponse<{
+        deposit: number;
+      }>
+    >("/deposit", {
+      deposit: denomination,
+    });
+
+    return response.data;
   };
 }
 

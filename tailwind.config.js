@@ -3,7 +3,7 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        primary: "#cf30ff",
+        "vendo-primary": "#cf30ff",
       },
     },
   },
