@@ -11,7 +11,8 @@ const BuyerApp: FC<{
     role?: UserRole;
   };
   logout: () => Promise<void>;
-  deposit: (denomination: number) => Promise<number>;
+  resetDeposit: () => Promise<void>;
+  deposit: (denomination: number) => Promise<number | undefined>;
   getProducts: () => Promise<void>;
   removeProduct: (productId: number) => Promise<void>;
   addProduct: (payload: ProductPayload) => Promise<void>;
@@ -27,6 +28,7 @@ const BuyerApp: FC<{
   buy,
   addProduct,
   updateProduct,
+  resetDeposit,
 }) => {
   return (
     <div className="flex flex-col">
@@ -53,6 +55,7 @@ const BuyerApp: FC<{
           />
         ) : (
           <Buyer
+            resetDeposit={resetDeposit}
             products={products}
             getProducts={getProducts}
             deposit={deposit}

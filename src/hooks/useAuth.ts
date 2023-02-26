@@ -1,6 +1,8 @@
 import { useNavigate } from "react-router-dom";
 import { useCallback, useEffect, useState } from "react";
 import VendoApiClient, { UserRole } from "../VendoApiClient";
+import { toast } from "react-hot-toast";
+import { formatChangeToText, notifyError } from "../utils";
 
 const useAuth = ({ api }: { api: VendoApiClient }) => {
   const navigate = useNavigate();
@@ -26,6 +28,7 @@ const useAuth = ({ api }: { api: VendoApiClient }) => {
       });
       setIsAuthenticated(true);
     } catch (err) {
+      notifyError(err);
     } finally {
       setIsAuthChecked(true);
     }
@@ -33,69 +36,102 @@ const useAuth = ({ api }: { api: VendoApiClient }) => {
 
   const login = useCallback(
     async ({ username, password }: { username: string; password: string }) => {
-      const response = await api.login({
-        username,
-        password,
-      });
+      try {
+        const response = await api.login({
+          username,
+          password,
+        });
 
-      setUser({
-        username: response.username,
-        role: response.role,
-        deposit: response.deposit,
-      });
+        setUser({
+          username: response.username,
+          role: response.role,
+          deposit: response.deposit,
+        });
 
-      setIsAuthChecked(true);
-      setIsAuthenticated(true);
-      return response;
+        setIsAuthChecked(true);
+        setIsAuthenticated(true);
+        return response;
+      } catch (err) {
+        notifyError(err);
+      }
     },
     [api]
   );
 
   const register = useCallback(
     async ({ username, password }: { username: string; password: string }) => {
-      const response = await api.register({
-        username,
-        password,
-      });
+      try {
+        const response = await api.register({
+          username,
+          password,
+        });
 
-      setUser({
-        username: response.username,
-        role: response.role,
-        deposit: response.deposit,
-      });
+        setUser({
+          username: response.username,
+          role: response.role,
+          deposit: response.deposit,
+        });
 
-      setIsAuthChecked(true);
-      setIsAuthenticated(true);
-      return response;
+        setIsAuthChecked(true);
+        setIsAuthenticated(true);
+        return response;
+      } catch (err) {
+        notifyError(err);
+      }
     },
     [api]
   );
 
   const deposit = useCallback(
     async (denomination: number) => {
-      const response = await api.deposit(denomination);
+      try {
+        const response = await api.deposit(denomination);
 
-      setUser({
-        ...user,
-        deposit: response.deposit,
-      });
+        setUser({
+          ...user,
+          deposit: response.deposit,
+        });
 
-      return response.deposit;
+        return response.deposit;
+      } catch (err) {
+        notifyError(err);
+      }
     },
     [user, api]
   );
 
+  const resetDeposit = useCallback(async () => {
+    try {
+      const { change } = await api.resetDeposit();
+      toast.success(
+        `Your deposit was reset succesfully.\nHere is your change: ${formatChangeToText(
+          change
+        )}`
+      );
+      setUser({
+        ...user,
+        deposit: 0,
+      });
+    } catch (err) {
+      notifyError(err);
+    }
+  }, [api, user]);
+
   const logout = useCallback(async () => {
-    await api.logout();
+    try {
+      await api.logout();
 
-    setUser({
-      username: "",
-      role: UserRole.BUYER,
-      deposit: 0,
-    });
+      setUser({
+        username: "",
+        role: UserRole.BUYER,
+        deposit: 0,
+      });
 
-    setIsAuthChecked(true);
-    setIsAuthenticated(false);
+      setIsAuthChecked(true);
+      setIsAuthenticated(false);
+    } catch (err) {
+      notifyError(err);
+    }
   }, [api]);
 
   useEffect(() => {
@@ -118,6 +154,7 @@ const useAuth = ({ api }: { api: VendoApiClient }) => {
     login,
     register,
     getUser,
+    resetDeposit,
   };
 };
 

@@ -14,17 +14,17 @@ const ProductListItem: FC<{
   const [amount, setAmount] = useState(1);
 
   const onAmountChange = useCallback((newAmount: number) => {
-    setAmount(newAmount);
+    setAmount(newAmount || 0);
   }, []);
 
   const totalCost = amount * product.cost;
 
   const onBuy = useCallback(async () => {
     await buy(product.id, amount);
-    setAmount(0);
+    setAmount(1);
   }, [amount, buy, product]);
 
-  const showInsufficientFundsError = deposit !== 0 && totalCost > deposit;
+  const showInsufficientFundsError = totalCost > deposit;
 
   return (
     <li className="flex items-center justify-between border-y p-2 last:border-y-0">
@@ -52,7 +52,7 @@ const ProductListItem: FC<{
               />
             </label>
             <Button
-              disabled={totalCost > deposit}
+              disabled={totalCost > deposit || totalCost === 0}
               className="rounded-l-none"
               onClick={onBuy}
             >
@@ -78,11 +78,12 @@ const ProductListItem: FC<{
 
 const Buyer: FC<{
   depositValue: number;
-  deposit: (denomination: number) => Promise<number>;
+  deposit: (denomination: number) => Promise<number | undefined>;
   getProducts: () => Promise<void>;
   buy: (productId: number, amount: number) => Promise<void>;
   products: Product[];
-}> = ({ depositValue, deposit, getProducts, products, buy }) => {
+  resetDeposit: () => Promise<void>;
+}> = ({ depositValue, deposit, getProducts, products, buy, resetDeposit }) => {
   const [isDepositing, setIsDepositing] = useState(false);
 
   const onDenominationClick = useCallback(
@@ -101,21 +102,26 @@ const Buyer: FC<{
 
   return (
     <div className="py-4 space-y-4">
-      <div className="border border-gray-200 rounded-sm p-2">
-        💰 You have {depositValue} cents.
+      <div className="border border-gray-200 rounded-sm p-2 flex items-center justify-between">
+        <div>💰 You have {depositValue} cents.</div>
+        <div>
+          <Button disabled={depositValue === 0} onClick={resetDeposit}>
+            Reset
+          </Button>
+        </div>
       </div>
       <div className="border border-gray-200 rounded-sm p-2 space-y-2">
         <h3>💳 Deposit cents:</h3>
         <div className="space-x-2">
           {ALLOWED_DENOMINATIONS.map((denomination) => (
-            <button
+            <Button
               disabled={isDepositing}
               className="border px-2 rounded hover:opacity-60 transition-opacity py-1 disabled:opacity-50"
               key={`denomination-${denomination}`}
               onClick={() => onDenominationClick(denomination)}
             >
               {denomination}
-            </button>
+            </Button>
           ))}
         </div>
       </div>

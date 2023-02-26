@@ -10,10 +10,18 @@ import useAuth from "./hooks/useAuth";
 import useProducts from "./hooks/useProducts";
 
 const App: FC<{ api: VendoApiClient }> = ({ api }) => {
-  const { isAuthChecked, user, logout, deposit, login, register, getUser } =
-    useAuth({
-      api,
-    });
+  const {
+    isAuthChecked,
+    user,
+    logout,
+    deposit,
+    login,
+    register,
+    getUser,
+    resetDeposit,
+  } = useAuth({
+    api,
+  });
 
   const {
     buy,
@@ -52,6 +60,7 @@ const App: FC<{ api: VendoApiClient }> = ({ api }) => {
               deposit={deposit}
               user={user}
               buy={buyProduct}
+              resetDeposit={resetDeposit}
             />
           }
         />

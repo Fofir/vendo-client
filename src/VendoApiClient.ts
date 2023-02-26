@@ -122,6 +122,17 @@ export class VendoApiClient {
 
     return response.data;
   };
+
+  resetDeposit = async () => {
+    const response = await this.api.post<
+      any,
+      AxiosResponse<{
+        change: number[];
+      }>
+    >("/reset");
+
+    return response.data;
+  };
 }
 
 export default VendoApiClient;
