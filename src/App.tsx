@@ -106,7 +106,7 @@ const useAuth = ({ api }: { api: VendoApiClient }) => {
 
   useEffect(() => {
     getUser();
-  }, []);
+  }, [getUser]);
 
   useEffect(() => {
     if (isAuthChecked && isAuthenticated) {
@@ -130,7 +130,6 @@ const useAuth = ({ api }: { api: VendoApiClient }) => {
 const useProducts = ({ api }: { api: VendoApiClient }) => {
   const [products, setProducts] = useState<Record<string, Product>>({});
 
-  const addProduct = useCallback(async () => {}, [api]);
   const removeProduct = useCallback(
     async (productId: number) => {
       await api.removeProduct(productId);
@@ -174,7 +173,6 @@ const useProducts = ({ api }: { api: VendoApiClient }) => {
   );
 
   return {
-    addProduct,
     getProducts,
     removeProduct,
     products: orderBy(products, ["productName"], ["asc"]),
