@@ -77,22 +77,22 @@ const ProductListItem: FC<{
 };
 
 const Buyer: FC<{
-  deposit: number;
-  onDeposit: (denomination: number) => Promise<number>;
+  depositValue: number;
+  deposit: (denomination: number) => Promise<number>;
   getProducts: () => Promise<void>;
   buy: (productId: number, amount: number) => Promise<void>;
   products: Product[];
-}> = ({ deposit, onDeposit, getProducts, products, buy }) => {
+}> = ({ depositValue, deposit, getProducts, products, buy }) => {
   const [isDepositing, setIsDepositing] = useState(false);
 
   const onDenominationClick = useCallback(
     async (denomination: number) => {
       setIsDepositing(true);
-      await onDeposit(denomination);
+      await deposit(denomination);
       toast.success(`You successfully deposited ${denomination} cents`);
       setIsDepositing(false);
     },
-    [onDeposit]
+    [deposit]
   );
 
   useEffect(() => {
@@ -102,7 +102,7 @@ const Buyer: FC<{
   return (
     <div className="py-4 space-y-4">
       <div className="border border-gray-200 rounded-sm p-2">
-        💰 You have {deposit} cents.
+        💰 You have {depositValue} cents.
       </div>
       <div className="border border-gray-200 rounded-sm p-2 space-y-2">
         <h3>💳 Deposit cents:</h3>
@@ -126,7 +126,7 @@ const Buyer: FC<{
             <ProductListItem
               key={product.id}
               product={product}
-              deposit={deposit}
+              deposit={depositValue}
               buy={buy}
             />
           ))}

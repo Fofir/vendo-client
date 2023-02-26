@@ -19,11 +19,11 @@ const useAuth = ({ api }: { api: VendoApiClient }) => {
   const [user, setUser] = useState<{
     username: string;
     role: UserRole;
-    desposit: number;
+    deposit: number;
   }>({
     username: "",
     role: UserRole.BUYER,
-    desposit: 0,
+    deposit: 0,
   });
 
   const getUser = useCallback(async () => {
@@ -32,7 +32,7 @@ const useAuth = ({ api }: { api: VendoApiClient }) => {
       setUser({
         username: response.username,
         role: response.role,
-        desposit: response.deposit,
+        deposit: response.deposit,
       });
       setIsAuthenticated(true);
     } catch (err) {
@@ -51,7 +51,7 @@ const useAuth = ({ api }: { api: VendoApiClient }) => {
       setUser({
         username: response.username,
         role: response.role,
-        desposit: response.deposit,
+        deposit: response.deposit,
       });
 
       setIsAuthChecked(true);
@@ -71,7 +71,7 @@ const useAuth = ({ api }: { api: VendoApiClient }) => {
       setUser({
         username: response.username,
         role: response.role,
-        desposit: response.deposit,
+        deposit: response.deposit,
       });
 
       setIsAuthChecked(true);
@@ -81,13 +81,13 @@ const useAuth = ({ api }: { api: VendoApiClient }) => {
     [api]
   );
 
-  const onDeposit = useCallback(
+  const deposit = useCallback(
     async (denomination: number) => {
       const response = await api.deposit(denomination);
 
       setUser({
         ...user,
-        desposit: response.deposit,
+        deposit: response.deposit,
       });
 
       return response.deposit;
@@ -101,7 +101,7 @@ const useAuth = ({ api }: { api: VendoApiClient }) => {
     setUser({
       username: "",
       role: UserRole.BUYER,
-      desposit: 0,
+      deposit: 0,
     });
 
     setIsAuthChecked(true);
@@ -124,7 +124,7 @@ const useAuth = ({ api }: { api: VendoApiClient }) => {
     isAuthChecked,
     user,
     logout,
-    onDeposit,
+    deposit,
     login,
     register,
     getUser,
@@ -215,7 +215,7 @@ const useProducts = ({ api }: { api: VendoApiClient }) => {
 };
 
 const App: FC<{ api: VendoApiClient }> = ({ api }) => {
-  const { isAuthChecked, user, logout, onDeposit, login, register, getUser } =
+  const { isAuthChecked, user, logout, deposit, login, register, getUser } =
     useAuth({
       api,
     });
@@ -254,10 +254,8 @@ const App: FC<{ api: VendoApiClient }> = ({ api }) => {
               getProducts={getProducts}
               removeProduct={removeProduct}
               logout={logout}
-              onDeposit={onDeposit}
-              username={user.username}
-              deposit={user.desposit}
-              role={user.role}
+              deposit={deposit}
+              user={user}
               buy={buyProduct}
             />
           }
